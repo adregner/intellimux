@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+require 'tmux'
+
+require 'intellimux/cli/opts'
+
+options = {
+  :layout => :main_vertical,
+  :main_percentage => 0.625, # 5/8ths
+}
+options.merge! Opts.parse
+
+puts options
+
+###
+# first, find the server
+tmux = Tmux::Server.new
+
+# TODO what if its not started yet
+
+###
+# second, find the session
+session = tmux.sessions.select do |session|
+  session.name == options[:session]
+end.first
+
+puts "session #{session.name} #{session.clients.first.device}"
+
+# TODO what if its not there yet
+
+###
+# third, find the (or make a) window
+window = session.windows.select do |window_num, window|
+  window.name.match /^#{options[:window]}[*#-]*$/
+end.values[0]
+
+puts "options #{options}"
+
+if window.nil?
+  window = session.create_window :name => options[:window], :command => options[:command]
+  puts "made a new window, #{window.name}"
+else
+  puts "found window #{window.name}"
+
+  first_pane = window.panes.first
+
+  # create a new pane
+  new_pane = first_pane.split :command => options[:command]
+
+  # move it to first position
+  new_pane.swap_with first_pane
+
+  # lay them out
+  window.layout = :main_vertical # TODO this doesn't support other layouts yet (options[:layout])
+
+  # the new pane is now the first pane
+  first_pane.select
+
+  # make it the right size
+  # TODO make this smart enough to take the selected layout into account
+  new_width = (window.width * options[:main_percentage]).to_i
+  direction = first_pane.width > new_width ? :left : :right
+  new_pane.resize direction, (window.width - new_width).abs
+end
+
