@@ -27,4 +27,9 @@ window unknown
 
 Dependencies
 ------------
-Ruby.  I've only tested this on ruby 1.9.
+Ruby
+  * I've only tested this on ruby 1.9.
+
+tmux-ruby gem
+  * gem install tmux-ruby
+  * version > 0.0.2, not yet released

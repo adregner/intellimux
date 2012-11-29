@@ -16,5 +16,7 @@ Gem::Specification.new do |s|
   s.files += `git ls-files bin`.split("\n")
   s.files.reject! { |fn| fn.include?(".dev") }
 
+  s.add_dependency("tmux-ruby", ">0.0.2")
+
   s.executables = ["intellimux"]
 end
