@@ -19,9 +19,9 @@ tmux = Tmux::Server.new
 
 ###
 # second, find the session
-session = tmux.sessions.select do |session|
+session = tmux.sessions.find do |session|
   session.name == options[:session]
-end.first
+end
 
 puts "session #{session.name} #{session.clients.first.device}"
 
@@ -29,9 +29,9 @@ puts "session #{session.name} #{session.clients.first.device}"
 
 ###
 # third, find the (or make a) window
-window = session.windows.select do |window_num, window|
+window = session.windows.find do |window_num, window|
   window.name.match /^#{options[:window]}[*#-]*$/
-end.values[0]
+end.last
 
 puts "options #{options}"
 
